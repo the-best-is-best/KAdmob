@@ -1,6 +1,5 @@
 # KAdmob
 
-[![CI Status](https://img.shields.io/travis/72160249/KAdmob.svg?style=flat)](https://travis-ci.org/72160249/KAdmob)
 [![Version](https://img.shields.io/cocoapods/v/KAdmob.svg?style=flat)](https://cocoapods.org/pods/KAdmob)
 [![License](https://img.shields.io/cocoapods/l/KAdmob.svg?style=flat)](https://cocoapods.org/pods/KAdmob)
 [![Platform](https://img.shields.io/cocoapods/p/KAdmob.svg?style=flat)](https://cocoapods.org/pods/KAdmob)
@@ -22,8 +21,10 @@ pod 'KAdmob'
 
 ## Author
 
-72160249, michelle.raouf@52ndsolution.net
+tbib, <michelle.raouf@outlook.com>
 
 ## License
 
 KAdmob is available under the MIT license. See the LICENSE file for more info.
+
+## Note this package used in kotlin multi-platform
