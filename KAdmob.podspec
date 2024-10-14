@@ -30,7 +30,9 @@ s.description      = "This package used for Kotlin multi-platform with Admob."
   s.swift_version    = '5.5'
 
   s.source_files = 'KAdmob/Classes/**/*'
-  
+  s.static_framework = true
+
+
   # s.resource_bundles = {
   #   'KAdmob' => ['KAdmob/Assets/*.png']
   # }
