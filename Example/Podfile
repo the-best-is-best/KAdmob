@@ -1,0 +1,6 @@
+use_frameworks!
+target 'KAdmob_Tests' do
+  pod 'KAdmob', :path => '../'
+  
+  
+end
