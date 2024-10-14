@@ -1,4 +1,4 @@
-platform :ios, '12'  # Set the iOS deployment target
+platform :ios, 13  # Set the iOS deployment target
 
 target 'KAdmob_Tests' do
   pod 'KAdmob', :path => '../'

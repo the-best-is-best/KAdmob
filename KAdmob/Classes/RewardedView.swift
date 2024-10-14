@@ -1,79 +1,50 @@
+import UIKit
 import GoogleMobileAds
-import SwiftUI
 
-@objc public class KRewardedAdView: UIView {
-    private var rewardedAd: GAMRewardedAd?
-    
-    @objc public var adUnitID: String? {
-        didSet {
-            if let adUnitID = adUnitID {
-                loadRewardedAd(adUnitID: adUnitID)
-            }
+class RewardedAdView: UIView {
+
+    private var rewardedAd: GADRewardedAd?
+    private let adUnitID: String
+
+    // Custom initializer to accept the ad unit ID
+    init(frame: CGRect, adUnitID: String?) {
+        // Ensure adUnitID is not nil or empty, otherwise throw an exception
+        guard let adUnitID = adUnitID, !adUnitID.isEmpty else {
+            fatalError("Ad unit ID cannot be nil or empty.")
         }
-    }
 
-    // Callback to return reward item
-    public var onRewarded: ((GADAdReward) -> Void)?
-
-    override init(frame: CGRect) {
+        self.adUnitID = adUnitID
         super.init(frame: frame)
-        loadRewardedAd(adUnitID: adUnitID ?? "")
+        
+        loadRewardedAd()
     }
 
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        loadRewardedAd(adUnitID: adUnitID ?? "")
+        fatalError("init(coder:) has not been implemented. Use the custom initializer instead.")
     }
 
-    private func loadRewardedAd(adUnitID: String) {
-        GAMRewardedAd.load(withAdUnitID: adUnitID, request: GADRequest()) { [weak self] (ad, error) in
-            if let error = error {
-                print("Failed to load rewarded ad: \(error.localizedDescription)")
-                return
+    private func loadRewardedAd() {
+        Task {
+            do {
+                rewardedAd = try await GADRewardedAd.load(
+                    withAdUnitID: adUnitID,
+                    request: GADRequest()
+                )
+                print("Rewarded ad loaded successfully.")
+            } catch {
+                print("Rewarded ad failed to load with error: \(error.localizedDescription)")
             }
-            self?.rewardedAd = ad
-            self?.rewardedAd?.fullScreenContentDelegate = self
         }
     }
 
-    @objc public func present(from viewController: UIViewController) {
-        rewardedAd?.present(fromRootViewController: viewController, userDidEarnRewardHandler: { [weak self] in
-            if let reward = self?.rewardedAd?.adReward {
-                self?.onRewarded?(reward)
-            }
-        })
-    }
-}
-
-// MARK: - GADFullScreenContentDelegate
-extension KRewardedAdView: GADFullScreenContentDelegate {
-    public func adDidRecordImpression(_ ad: GADFullScreenContent) {
-        print("Rewarded ad did record impression.")
-    }
-
-    public func adDidDismissFullScreenContent(_ ad: GADFullScreenContent) {
-        print("Rewarded ad did dismiss.")
-        // Optionally, load a new ad
-        loadRewardedAd(adUnitID: adUnitID ?? "")
-    }
-
-    public func ad(_ ad: GADFullScreenContent, didFailToPresentFullScreenContentWithError error: Error) {
-        print("Rewarded ad failed to present: \(error.localizedDescription)")
-    }
-}
-
-struct RewardedAdView: UIViewRepresentable {
-    let adUnitID: String
-    var onRewarded: ((GADAdReward) -> Void)?
-
-    func makeUIView(context: Context) -> KRewardedAdView {
-        let rewardedAdView = KRewardedAdView()
-        rewardedAdView.adUnitID = adUnitID
-        rewardedAdView.onRewarded = onRewarded
-        return rewardedAdView
-    }
-
-    func updateUIView(_ uiView: KRewardedAdView, context: Context) {
-        // Update the UIView if needed
+    func showAd(from viewController: UIViewController, rewardHandler: @escaping (GADAdReward?) -> Void) {
+        guard let rewardedAd = rewardedAd else {
+            print("Rewarded ad is not ready yet.")
+            return
+        }
+        
+        rewardedAd.present(fromRootViewController: viewController) {             // Call the rewardHandler with the reward item
+            rewardHandler(rewardedAd.adReward)
+        }
     }
 }

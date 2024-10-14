@@ -1,82 +1,51 @@
+import UIKit
 import GoogleMobileAds
-import SwiftUI
 
-@objc public class KRewardedInterstitialView: UIView {
-    private var rewardedInterstitialAd: GAMRewardedInterstitialAd?
+class RewardedInterstitialAdView: UIView {
+    
+    private var rewardedInterstitialAd: GADRewardedInterstitialAd?
+    private let adUnitID: String
 
-    @objc public var adUnitID: String? {
-        didSet {
-            if let adUnitID = adUnitID {
-                loadRewardedInterstitialAd(adUnitID: adUnitID)
-            }
+    // Custom initializer to accept the ad unit ID
+    init(frame: CGRect, adUnitID: String?) {
+        // Ensure adUnitID is not nil or empty, otherwise throw an exception
+        guard let adUnitID = adUnitID, !adUnitID.isEmpty else {
+            fatalError("Ad unit ID cannot be nil or empty.")
         }
-    }
-
-    // Callback to return the reward item
-    public var onRewarded: ((GADAdReward) -> Void)?
-
-    override init(frame: CGRect) {
+        
+        self.adUnitID = adUnitID
         super.init(frame: frame)
-        loadRewardedInterstitialAd(adUnitID: adUnitID ?? "")
+        
+        loadRewardedInterstitialAd()
     }
 
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        loadRewardedInterstitialAd(adUnitID: adUnitID ?? "")
+        fatalError("init(coder:) has not been implemented. Use the custom initializer instead.")
     }
 
-    private func loadRewardedInterstitialAd(adUnitID: String) {
-        GAMRewardedInterstitialAd.load(withAdUnitID: adUnitID, request: GADRequest()) { [weak self] (ad, error) in
-            if let error = error {
-                print("Failed to load rewarded interstitial ad: \(error.localizedDescription)")
-                return
+    private func loadRewardedInterstitialAd() {
+        Task {
+            do {
+                rewardedInterstitialAd = try await GADRewardedInterstitialAd.load(
+                    withAdUnitID: adUnitID,
+                    request: GADRequest()
+                )
+                print("Rewarded interstitial ad loaded successfully.")
+            } catch {
+                print("Failed to load rewarded interstitial ad with error: \(error.localizedDescription)")
             }
-            self?.rewardedInterstitialAd = ad
-            self?.rewardedInterstitialAd?.fullScreenContentDelegate = self
         }
     }
 
-    @objc public func present(from viewController: UIViewController) {
-        rewardedInterstitialAd?.present(fromRootViewController: viewController, userDidEarnRewardHandler: { [weak self] in
-            guard let reward = self?.rewardedInterstitialAd?.adReward else {
-                print("Reward not available")
-                return
-            }
-            self?.onRewarded?(reward) // Call the callback with the reward item
-        })
+    func showAd(from viewController: UIViewController, rewardHandler: @escaping (GADAdReward?) -> Void) {
+        guard let rewardedInterstitialAd = rewardedInterstitialAd else {
+            print("Rewarded interstitial ad is not ready yet.")
+            return
+        }
+        
+        rewardedInterstitialAd.present(fromRootViewController: viewController) {
+            // Call the rewardHandler with the reward item
+            rewardHandler(rewardedInterstitialAd.adReward)
+        }
     }
 }
-
-// MARK: - GADFullScreenContentDelegate
-extension KRewardedInterstitialView: GADFullScreenContentDelegate {
-    public func adDidRecordImpression(_ ad: GADFullScreenContent) {
-        print("Rewarded interstitial ad did record impression.")
-    }
-
-    public func adDidDismissFullScreenContent(_ ad: GADFullScreenContent) {
-        print("Rewarded interstitial ad did dismiss.")
-        // Optionally, load a new ad
-        loadRewardedInterstitialAd(adUnitID: adUnitID ?? "")
-    }
-
-    public func ad(_ ad: GADFullScreenContent, didFailToPresentFullScreenContentWithError error: Error) {
-        print("Rewarded interstitial ad failed to present: \(error.localizedDescription)")
-    }
-}
-
-struct RewardedInterstitialAdView: UIViewRepresentable {
-    let adUnitID: String
-    var onRewarded: ((GADAdReward) -> Void)?
-
-    func makeUIView(context: Context) -> KRewardedInterstitialView {
-        let rewardedInterstitialView = KRewardedInterstitialView()
-        rewardedInterstitialView.adUnitID = adUnitID
-        rewardedInterstitialView.onRewarded = onRewarded // Set the callback
-        return rewardedInterstitialView
-    }
-
-    func updateUIView(_ uiView: KRewardedInterstitialView, context: Context) {
-        // Update the UIView if needed
-    }
-}
-

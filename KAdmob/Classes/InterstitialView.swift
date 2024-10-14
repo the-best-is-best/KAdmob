@@ -1,71 +1,46 @@
+import UIKit
 import GoogleMobileAds
-import SwiftUI
 
-@objc public class KInterstitialAdView: UIView {
-    private var interstitialAd: GAMInterstitialAd?
+@objc public class InterstitialAdView: UIView, GADFullScreenContentDelegate {
+    private var interstitial: GADInterstitialAd?
+    private let adUnitID: String
 
-    @objc public var adUnitID: String? {
-        didSet {
-            if let adUnitID = adUnitID {
-                loadInterstitialAd(adUnitID: adUnitID)
-            }
+    // Custom initializer to accept the ad unit ID
+    init(frame: CGRect, adUnitID: String?) {
+        // Ensure adUnitID is not nil or empty, otherwise throw an exception
+        guard let adUnitID = adUnitID, !adUnitID.isEmpty else {
+            fatalError("Ad unit ID cannot be nil or empty.")
         }
-    }
-
-    override init(frame: CGRect) {
+        
+        self.adUnitID = adUnitID
         super.init(frame: frame)
-        loadInterstitialAd(adUnitID: adUnitID ?? "")
+        loadInterstitialAd()
     }
 
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        loadInterstitialAd(adUnitID: adUnitID ?? "")
+        fatalError("init(coder:) has not been implemented. Use the custom initializer instead.")
     }
 
-    private func loadInterstitialAd(adUnitID: String) {
-        GAMInterstitialAd.load(withAdUnitID: adUnitID, request: GADRequest()) { [weak self] (ad, error) in
+    private func loadInterstitialAd() {
+        let request = GADRequest()
+        GADInterstitialAd.load(withAdUnitID: adUnitID, request: request) { [self] (ad, error) in
             if let error = error {
                 print("Failed to load interstitial ad: \(error.localizedDescription)")
                 return
             }
-            self?.interstitialAd = ad
-            self?.interstitialAd?.fullScreenContentDelegate = self
+            interstitial = ad
+            interstitial?.fullScreenContentDelegate = self
         }
     }
 
-    @objc public func present(from viewController: UIViewController) {
-        interstitialAd?.present(fromRootViewController: viewController)
-    }
-}
-
-// MARK: - GADFullScreenContentDelegate
-extension KInterstitialAdView: GADFullScreenContentDelegate {
-    public func adDidRecordImpression(_ ad: GADFullScreenContent) {
-        print("Interstitial ad did record impression.")
+    func showInterstitial(from viewController: UIViewController) {
+        if let interstitial = interstitial {
+            interstitial.present(fromRootViewController: viewController)
+        } else {
+            print("Interstitial ad is not ready yet.")
+        }
     }
 
-    public func adDidDismissFullScreenContent(_ ad: GADFullScreenContent) {
-        print("Interstitial ad did dismiss.")
-        // Optionally, load a new ad
-        loadInterstitialAd(adUnitID: adUnitID ?? "")
-    }
-
-    public func ad(_ ad: GADFullScreenContent, didFailToPresentFullScreenContentWithError error: Error) {
-        print("Interstitial ad failed to present: \(error.localizedDescription)")
-    }
-}
-
-struct InterstitialAdView: UIViewRepresentable {
-    let adUnitID: String
-
-    func makeUIView(context: Context) -> KInterstitialAdView {
-        let interstitialAdView = KInterstitialAdView()
-        interstitialAdView.adUnitID = adUnitID
-        return interstitialAdView
-    }
-
-    func updateUIView(_ uiView: KInterstitialAdView, context: Context) {
-        // Update the UIView if needed
-    }
+  
 }
 

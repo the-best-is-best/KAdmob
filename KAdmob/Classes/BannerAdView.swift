@@ -1,65 +1,73 @@
 import GoogleMobileAds
-import SwiftUI
+import UIKit
 
-@objc public class KBannerView: UIView {
-    private var bannerView: GADBannerView?
-    
-    @objc public var adUnitID: String? {
-        didSet {
-            if let adUnitID = adUnitID {
-                setupBannerView(adUnitID: adUnitID)
-            }
-        }
+// Enum to define banner ad types
+ enum KAdmobBannerType {
+    case banner
+    case fullBanner
+    case largeBanner
+}
+
+@objc public class KBannerAdView: UIView {
+
+    private var bannerView: GAMBannerView!
+
+    // Enum to define banner ad types
+    @objc public enum KAdmobBannerType: Int {
+        case banner
+        case fullBanner
+        case largeBanner
     }
 
+    // Property to hold the ad unit ID, default is nil
+    @objc public var adUnitID: String? // Default is nil
+
+    // Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupBannerView(adUnitID: adUnitID ?? "")
+        setupBannerView()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupBannerView(adUnitID: adUnitID ?? "")
+        setupBannerView()
     }
-    
-    private func setupBannerView(adUnitID: String) {
-        bannerView = GADBannerView(adSize: kGADAdSizeBanner)
-        if let bannerView = bannerView {
-            bannerView.adUnitID = adUnitID
-            
-            // Set the root view controller for the banner view
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let rootViewController = windowScene.windows.first?.rootViewController {
-                bannerView.rootViewController = rootViewController
-            }
 
-            // Load the ad
-            bannerView.load(GADRequest())
-            
-            // Add bannerView to the KBannerView
-            bannerView.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(bannerView)
-            
-            // Set up constraints
-            NSLayoutConstraint.activate([
-                bannerView.centerXAnchor.constraint(equalTo: centerXAnchor),
-                bannerView.bottomAnchor.constraint(equalTo: bottomAnchor)
-            ])
+    // Function to set up the banner view
+    private func setupBannerView() {
+        bannerView = GAMBannerView(adSize: GADAdSizeBanner)
+        bannerView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(bannerView)
+
+        // Add constraints to position the banner view
+        NSLayoutConstraint.activate([
+            bannerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            bannerView.centerXAnchor.constraint(equalTo: centerXAnchor)
+        ])
+    }
+
+    // Public method to load an ad of a specific type
+    @objc public func loadAd(ofType type: KAdmobBannerType) {
+        // Throw an exception if adUnitID is nil
+        guard let adUnitID = adUnitID else {
+            fatalError("Ad Unit ID cannot be nil. Please set a valid ad unit ID.")
         }
+
+        let adSize: GADAdSize
+        switch type {
+        case .banner:
+            adSize = GADAdSizeBanner
+        case .fullBanner:
+            adSize = GADAdSizeFullBanner
+        case .largeBanner:
+            adSize = GADAdSizeLargeBanner
+        }
+
+        // Update banner view size
+        bannerView.adSize = adSize
+
+        // Set the ad unit ID and load an ad
+        bannerView.adUnitID = adUnitID // Use the variable instead of a hardcoded string
+        bannerView.load(GADRequest())
     }
 }
-
-struct BannerAdView: UIViewRepresentable {
-    let adUnitID: String
-    
-    func makeUIView(context: Context) -> KBannerView {
-        let bannerView = KBannerView()
-        bannerView.adUnitID = adUnitID
-        return bannerView
-    }
-    
-    func updateUIView(_ uiView: KBannerView, context: Context) {
-        // Update the UIView if needed
-    }
-}
-
