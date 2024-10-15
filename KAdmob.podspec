@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'KAdmob'
-  s.version          = '0.1.0-11-rc'
+  s.version          = '0.1.0-10-rc'
   s.summary          = 'This package used for kmm with Admob.'
 
 # This description is used to generate tags and improve search results.
