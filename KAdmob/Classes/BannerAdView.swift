@@ -24,8 +24,8 @@ import UIKit
 
     // Initializer
     // Initializer that takes adUnitID and adType
-     @objc public init(frame: CGRect, adUnitID: String?, adType: KAdmobBannerType) {
-         super.init(frame: frame)
+    @objc public init(adUnitID: String?, adType: KAdmobBannerType) {
+         super.init(frame: .zero)
          self.adUnitID = adUnitID
          setupBannerView()
          loadAd(ofType: adType)
