@@ -14,11 +14,10 @@ import UIKit
     @objc public var adUnitID: String? // Property to hold the ad unit ID, default is nil
 
     // Initializer that takes adUnitID and adType
-    @objc public init(adUnitID: String?, adType: KAdmobBannerType) {
+    @objc public init(adUnitID: String?) {
         super.init(frame: .zero)
         self.adUnitID = adUnitID
         setupBannerView()
-        loadAd(ofType: adType)
     }
 
     required init?(coder: NSCoder) {

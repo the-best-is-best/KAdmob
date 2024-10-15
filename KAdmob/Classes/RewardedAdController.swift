@@ -2,20 +2,17 @@ import UIKit
 import GoogleMobileAds
 
 @objc public class RewardedAdController: UIViewController {
-
     private var rewardedAd: GADRewardedAd?
     private let adUnitID: String
+    private var isAdLoaded = false // Track if ad is loaded
 
-    // Custom initializer to accept the ad unit ID
     @objc public init(adUnitID: String?) {
-        // Ensure adUnitID is not nil or empty, otherwise throw an exception
         guard let adUnitID = adUnitID, !adUnitID.isEmpty else {
             fatalError("Ad unit ID cannot be nil or empty.")
         }
 
         self.adUnitID = adUnitID
         super.init(nibName: nil, bundle: nil)
-        
         loadRewardedAd()
     }
 
@@ -23,29 +20,33 @@ import GoogleMobileAds
         fatalError("init(coder:) has not been implemented. Use the custom initializer instead.")
     }
 
-    private func loadRewardedAd() {
-        Task {
-            do {
-                rewardedAd = try await GADRewardedAd.load(
-                    withAdUnitID: adUnitID,
-                    request: GADRequest()
-                )
-                print("Rewarded ad loaded successfully.")
-            } catch {
-                print("Rewarded ad failed to load with error: \(error.localizedDescription)")
+    @objc public func loadRewardedAd() {
+        let request = GADRequest()
+        GADRewardedAd.load(withAdUnitID: adUnitID, request: request) { [weak self] ad, error in
+            if let error = error {
+                print("Failed to load rewarded ad: \(error.localizedDescription)")
+                self?.isAdLoaded = false
+                return
             }
+            self?.rewardedAd = ad
+            self?.isAdLoaded = true
+            print("Rewarded ad loaded successfully.")
         }
     }
 
     @objc public func showAd(rewardHandler: @escaping (GADAdReward?) -> Void) {
-        guard let rewardedAd = rewardedAd else {
+        guard let rewardedAd = rewardedAd, isAdLoaded else {
             print("Rewarded ad is not ready yet.")
+            loadRewardedAd() // Optionally reload the ad
             return
         }
-        
+
         rewardedAd.present(fromRootViewController: self) {
-            // Call the rewardHandler with the reward item
             rewardHandler(rewardedAd.adReward)
         }
+        
+        // Mark the ad as not loaded after showing and reload a new one
+        isAdLoaded = false
+        loadRewardedAd()
     }
 }

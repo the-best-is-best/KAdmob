@@ -16,14 +16,15 @@ import GoogleMobileAds
         self.adUnitID = adUnitID
         super.init(nibName: nil, bundle: nil)
         
-        loadRewardedInterstitialAd()
+        loadRewardedInterstitialAd() // Load ad initially
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented. Use the custom initializer instead.")
     }
 
-    private func loadRewardedInterstitialAd() {
+    // Load a rewarded interstitial ad
+    @objc public func loadRewardedInterstitialAd() {
         // Async ad loading
         Task {
             do {
@@ -50,10 +51,13 @@ import GoogleMobileAds
             print("ViewController is not in a visible state.")
             return
         }
-        
+
         rewardedInterstitialAd.present(fromRootViewController: self) {
             // Call the rewardHandler with the reward item
             rewardHandler(rewardedInterstitialAd.adReward)
+
+            // Load a new ad after the current ad is presented and the reward has been handled
+            self.loadRewardedInterstitialAd()
         }
     }
 }

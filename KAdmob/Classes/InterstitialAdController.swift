@@ -1,17 +1,16 @@
 import UIKit
 import GoogleMobileAds
 
-@objc public class InterstitialAdController: UIViewController, GADFullScreenContentDelegate {
+@objc public class InterstitialAdController: UIViewController {
     private var interstitial: GADInterstitialAd?
     private let adUnitID: String
+    private var isAdLoaded = false // Track if ad is loaded
 
-    // Custom initializer to accept the ad unit ID
     @objc public init(adUnitID: String?) {
-        // Ensure adUnitID is not nil or empty, otherwise throw an exception
         guard let adUnitID = adUnitID, !adUnitID.isEmpty else {
             fatalError("Ad unit ID cannot be nil or empty.")
         }
-        
+
         self.adUnitID = adUnitID
         super.init(nibName: nil, bundle: nil)
         loadInterstitialAd()
@@ -21,26 +20,32 @@ import GoogleMobileAds
         fatalError("init(coder:) has not been implemented. Use the custom initializer instead.")
     }
 
-    private func loadInterstitialAd() {
+    @objc public func loadInterstitialAd() {
         let request = GADRequest()
-        GADInterstitialAd.load(withAdUnitID: adUnitID, request: request) { [weak self] (ad, error) in
+        GADInterstitialAd.load(withAdUnitID: adUnitID, request: request) { [weak self] ad, error in
             if let error = error {
                 print("Failed to load interstitial ad: \(error.localizedDescription)")
+                self?.isAdLoaded = false // Mark ad as not loaded
                 return
             }
             self?.interstitial = ad
-            self?.interstitial?.fullScreenContentDelegate = self
+            self?.isAdLoaded = true // Ad is loaded successfully
             print("Interstitial ad loaded successfully.")
         }
     }
 
     @objc public func showInterstitial(from viewController: UIViewController) {
-        if let interstitial = interstitial {
-            interstitial.present(fromRootViewController: viewController)
-        } else {
+        guard let interstitial = interstitial, isAdLoaded else {
             print("Interstitial ad is not ready yet.")
+            loadInterstitialAd() // Optionally reload the ad
+            return
         }
-    }
 
-    
+        interstitial.present(fromRootViewController: viewController)
+        print("Showing interstitial ad.")
+        
+        // Mark the ad as not loaded after showing and reload a new one
+        isAdLoaded = false
+        loadInterstitialAd()
+    }
 }
