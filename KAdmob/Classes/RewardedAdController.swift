@@ -34,15 +34,18 @@ import GoogleMobileAds
         }
     }
 
-    @objc public func showAd(rewardHandler: @escaping (GADAdReward?) -> Void) {
+    @objc public func showAd(rewardHandler: @escaping (KRewardAdItem?) -> Void) {
         guard let rewardedAd = rewardedAd, isAdLoaded else {
             print("Rewarded ad is not ready yet.")
             loadRewardedAd() // Optionally reload the ad
             return
         }
-
+       
         rewardedAd.present(fromRootViewController: self) {
-            rewardHandler(rewardedAd.adReward)
+            let reward = KRewardAdItem()
+            reward.type = rewardedAd.adReward.type
+            reward.ammount = Int(truncating: rewardedAd.adReward.amount)
+            rewardHandler(reward)
         }
         
         // Mark the ad as not loaded after showing and reload a new one
