@@ -53,10 +53,8 @@ import GoogleMobileAds
         }
 
         rewardedInterstitialAd.present(fromRootViewController: self) {
-            let reward = KRewardAdItem()
-            reward.type = rewardedInterstitialAd.adReward.type
-            reward.ammount = Int(truncating: rewardedInterstitialAd.adReward.amount)
-            // Call the rewardHandler with the reward item
+            let reward = KRewardAdItem(rewardedInterstitialAd.adReward.type, Int(truncating: rewardedInterstitialAd.adReward.amount))
+             // Call the rewardHandler with the reward item
             rewardHandler(reward)
 
             // Load a new ad after the current ad is presented and the reward has been handled

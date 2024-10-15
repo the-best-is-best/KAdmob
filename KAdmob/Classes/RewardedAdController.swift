@@ -42,9 +42,7 @@ import GoogleMobileAds
         }
        
         rewardedAd.present(fromRootViewController: self) {
-            let reward = KRewardAdItem()
-            reward.type = rewardedAd.adReward.type
-            reward.ammount = Int(truncating: rewardedAd.adReward.amount)
+            let reward = KRewardAdItem(rewardedAd.adReward.type, Int(truncating: rewardedAd.adReward.amount))
             rewardHandler(reward)
         }
         
