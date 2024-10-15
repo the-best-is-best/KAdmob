@@ -1,7 +1,7 @@
 import UIKit
 import GoogleMobileAds
 
-@objc public class RewardedInterstitialAdView: UIViewController {
+@objc public class RewardedInterstitialAdController: UIViewController {
     
     private var rewardedInterstitialAd: GADRewardedInterstitialAd?
     private let adUnitID: String
@@ -24,6 +24,7 @@ import GoogleMobileAds
     }
 
     private func loadRewardedInterstitialAd() {
+        // Async ad loading
         Task {
             do {
                 rewardedInterstitialAd = try await GADRewardedInterstitialAd.load(
@@ -37,13 +38,20 @@ import GoogleMobileAds
         }
     }
 
-    @objc public func showAd(from viewController: UIViewController, rewardHandler: @escaping (GADAdReward?) -> Void) {
+    // Show the ad
+    @objc public func showAd(rewardHandler: @escaping (GADAdReward?) -> Void) {
         guard let rewardedInterstitialAd = rewardedInterstitialAd else {
             print("Rewarded interstitial ad is not ready yet.")
             return
         }
         
-        rewardedInterstitialAd.present(fromRootViewController: viewController) {
+        // Ensure the view is loaded and visible
+        guard self.isViewLoaded, self.view.window != nil else {
+            print("ViewController is not in a visible state.")
+            return
+        }
+        
+        rewardedInterstitialAd.present(fromRootViewController: self) {
             // Call the rewardHandler with the reward item
             rewardHandler(rewardedInterstitialAd.adReward)
         }

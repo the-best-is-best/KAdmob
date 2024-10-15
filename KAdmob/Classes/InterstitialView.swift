@@ -1,7 +1,7 @@
 import UIKit
 import GoogleMobileAds
 
-@objc public class InterstitialAdView: UIViewController, GADFullScreenContentDelegate {
+@objc public class InterstitialAdController: UIViewController, GADFullScreenContentDelegate {
     private var interstitial: GADInterstitialAd?
     private let adUnitID: String
 
