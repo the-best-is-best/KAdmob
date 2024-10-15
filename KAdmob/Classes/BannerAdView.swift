@@ -23,10 +23,13 @@ import UIKit
     @objc public var adUnitID: String? // Default is nil
 
     // Initializer
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupBannerView()
-    }
+    // Initializer that takes adUnitID and adType
+     @objc public init(frame: CGRect, adUnitID: String?, adType: KAdmobBannerType) {
+         super.init(frame: frame)
+         self.adUnitID = adUnitID
+         setupBannerView()
+         loadAd(ofType: adType)
+     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)

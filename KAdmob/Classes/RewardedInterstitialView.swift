@@ -1,20 +1,20 @@
 import UIKit
 import GoogleMobileAds
 
-class RewardedInterstitialAdView: UIView {
+@objc public class RewardedInterstitialAdView: UIViewController {
     
     private var rewardedInterstitialAd: GADRewardedInterstitialAd?
     private let adUnitID: String
 
     // Custom initializer to accept the ad unit ID
-    init(frame: CGRect, adUnitID: String?) {
+    @objc public init(adUnitID: String?) {
         // Ensure adUnitID is not nil or empty, otherwise throw an exception
         guard let adUnitID = adUnitID, !adUnitID.isEmpty else {
             fatalError("Ad unit ID cannot be nil or empty.")
         }
         
         self.adUnitID = adUnitID
-        super.init(frame: frame)
+        super.init(nibName: nil, bundle: nil)
         
         loadRewardedInterstitialAd()
     }
