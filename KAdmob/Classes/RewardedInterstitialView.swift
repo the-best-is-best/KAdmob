@@ -37,7 +37,7 @@ import GoogleMobileAds
         }
     }
 
-    func showAd(from viewController: UIViewController, rewardHandler: @escaping (GADAdReward?) -> Void) {
+    @objc public func showAd(from viewController: UIViewController, rewardHandler: @escaping (GADAdReward?) -> Void) {
         guard let rewardedInterstitialAd = rewardedInterstitialAd else {
             print("Rewarded interstitial ad is not ready yet.")
             return

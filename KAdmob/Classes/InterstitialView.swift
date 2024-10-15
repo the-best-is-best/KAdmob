@@ -34,7 +34,7 @@ import GoogleMobileAds
         }
     }
 
-    func showInterstitial(from viewController: UIViewController) {
+    @objc public func showInterstitial(from viewController: UIViewController) {
         if let interstitial = interstitial {
             interstitial.present(fromRootViewController: viewController)
         } else {

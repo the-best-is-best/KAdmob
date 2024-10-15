@@ -37,7 +37,7 @@ import GoogleMobileAds
         }
     }
 
-    func showAd(rewardHandler: @escaping (GADAdReward?) -> Void) {
+    @objc public func showAd(rewardHandler: @escaping (GADAdReward?) -> Void) {
         guard let rewardedAd = rewardedAd else {
             print("Rewarded ad is not ready yet.")
             return
