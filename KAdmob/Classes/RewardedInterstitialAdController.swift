@@ -40,7 +40,7 @@ import GoogleMobileAds
     }
 
     // Show the ad
-    @objc public func showAd(rewardHandler: @escaping (KRewardAdItem?) -> Void) {
+    @objc public func showAd(from viewController: UIViewController , rewardHandler: @escaping (KRewardAdItem?) -> Void) {
         guard let rewardedInterstitialAd = rewardedInterstitialAd else {
             print("Rewarded interstitial ad is not ready yet.")
             return
@@ -52,7 +52,7 @@ import GoogleMobileAds
             return
         }
 
-        rewardedInterstitialAd.present(fromRootViewController: self) {
+        rewardedInterstitialAd.present(fromRootViewController: viewController) {
             let reward = KRewardAdItem(rewardedInterstitialAd.adReward.type, Int(truncating: rewardedInterstitialAd.adReward.amount))
              // Call the rewardHandler with the reward item
             rewardHandler(reward)

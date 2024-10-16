@@ -34,14 +34,14 @@ import GoogleMobileAds
         }
     }
 
-    @objc public func showAd(rewardHandler: @escaping (KRewardAdItem?) -> Void) {
+    @objc public func showAd(from viewController: UIViewController , rewardHandler: @escaping (KRewardAdItem?) -> Void) {
         guard let rewardedAd = rewardedAd, isAdLoaded else {
             print("Rewarded ad is not ready yet.")
             loadRewardedAd() // Optionally reload the ad
             return
         }
        
-        rewardedAd.present(fromRootViewController: self) {
+        rewardedAd.present(fromRootViewController: viewController) {
             let reward = KRewardAdItem(rewardedAd.adReward.type, Int(truncating: rewardedAd.adReward.amount))
             rewardHandler(reward)
         }
