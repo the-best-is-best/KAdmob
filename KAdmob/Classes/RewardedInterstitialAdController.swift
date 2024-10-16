@@ -46,11 +46,7 @@ import GoogleMobileAds
             return
         }
         
-        // Ensure the view is loaded and visible
-        guard self.isViewLoaded, self.view.window != nil else {
-            print("ViewController is not in a visible state.")
-            return
-        }
+        
 
         rewardedInterstitialAd.present(fromRootViewController: viewController) {
             let reward = KRewardAdItem(rewardedInterstitialAd.adReward.type, Int(truncating: rewardedInterstitialAd.adReward.amount))
