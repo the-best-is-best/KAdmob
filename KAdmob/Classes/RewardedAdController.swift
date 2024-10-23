@@ -13,7 +13,6 @@ import GoogleMobileAds
 
         self.adUnitID = adUnitID
         super.init(nibName: nil, bundle: nil)
-        loadRewardedAd()
     }
 
     required init?(coder: NSCoder) {
