@@ -37,7 +37,9 @@ import GoogleMobileAds
     @objc public func showInterstitial(from viewController: UIViewController, loadNewAd: Bool) {
         guard let interstitial = interstitial, isAdLoaded else {
             print("Interstitial ad is not ready yet.")
-            loadInterstitialAd() // Optionally reload the ad
+            if(loadNewAd){
+                loadInterstitialAd()
+            }
             return
         }
 
