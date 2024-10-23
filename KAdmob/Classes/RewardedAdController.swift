@@ -34,7 +34,7 @@ import GoogleMobileAds
         }
     }
 
-    @objc public func showAd(from viewController: UIViewController , rewardHandler: @escaping (KRewardAdItem?) -> Void) {
+    @objc public func showAd(from viewController: UIViewController ,loadNewAd:Bool, rewardHandler: @escaping (KRewardAdItem?) -> Void) {
         guard let rewardedAd = rewardedAd, isAdLoaded else {
             print("Rewarded ad is not ready yet.")
             loadRewardedAd() // Optionally reload the ad
@@ -48,6 +48,8 @@ import GoogleMobileAds
         
         // Mark the ad as not loaded after showing and reload a new one
         isAdLoaded = false
-        loadRewardedAd()
+        if(loadNewAd){
+            loadRewardedAd()
+        }
     }
 }
