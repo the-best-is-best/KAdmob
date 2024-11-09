@@ -13,15 +13,15 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/googleads/googleads-mobile-ios-sdk.git", from: "11.10.0"),
-        .package(url: "https://github.com/google/GoogleUserMessagingPlatform.git", from: "2.6.0")
+        .package(url: "https://github.com/googleads/swift-package-manager-google-mobile-ads.git", from: "11.10.0"),
+        .package(url: "https://github.com/googleads/swift-package-manager-google-user-messaging-platform", from: "2.6.0")
     ],
     targets: [
         .target(
             name: "KAdmob",
             dependencies: [
-                .product(name: "GoogleMobileAds", package: "googleads-mobile-ios-sdk"),
-                .product(name: "GoogleUserMessagingPlatform", package: "GoogleUserMessagingPlatform")
+                .product(name: "GoogleMobileAds", package: "swift-package-manager-google-mobile-ads"),
+                .product(name: "GoogleUserMessagingPlatform", package: "swift-package-manager-google-user-messaging-platform")
             ],
             path: "KAdmob/Classes",
             resources: []
